@@ -1,23 +1,41 @@
 import { put } from "@vercel/blob";
+import { existsSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 
 const DATA_PREFIX = "love-memory-v1/data/";
 const METADATA_PREFIX = "love-memory-v1/metadata/";
 const PRIVATE_ACCESS = "private";
 
-function required(name) {
-  const value = process.env[name]?.trim();
+async function loadLocalEnvironment() {
+  const file = new URL("../.env.local", import.meta.url);
+  if (!existsSync(file)) {
+    return;
+  }
+
+  const contents = await readFile(file, "utf8");
+  for (const line of contents.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    const separator = trimmed.indexOf("=");
+    if (!trimmed || trimmed.startsWith("#") || separator <= 0) {
+      continue;
+    }
+    const key = trimmed.slice(0, separator);
+    const value = trimmed.slice(separator + 1);
+    process.env[key] ??= value;
+  }
+}
+
+function required(...names) {
+  const value = names.map((name) => process.env[name]?.trim()).find(Boolean);
   if (!value) {
-    throw new Error(`Missing required environment variable: ${name}`);
+    throw new Error(`Missing required environment variable: ${names.join(" or ")}`);
   }
   return value;
 }
 
 const baseUrl = (process.env.LEGACY_BASE_URL || "https://coconutxuanmei.icu").replace(/\/$/, "");
-const masterPassword = required("LEGACY_MASTER_PASSWORD");
-const profilePasswords = {
-  coconut: required("LEGACY_COCONUT_PASSWORD"),
-  xuanmei: required("LEGACY_XUANMEI_PASSWORD"),
-};
+let masterPassword;
+let profilePasswords;
 
 function dataPath(key) {
   return `${DATA_PREFIX}${key}`;
@@ -175,7 +193,13 @@ async function migrateCycles(coconutClient) {
 }
 
 async function main() {
+  await loadLocalEnvironment();
   required("BLOB_READ_WRITE_TOKEN");
+  masterPassword = required("LEGACY_MASTER_PASSWORD", "MEMORY_PASSWORD");
+  profilePasswords = {
+    coconut: required("LEGACY_COCONUT_PASSWORD", "COCONUT_PASSWORD"),
+    xuanmei: required("LEGACY_XUANMEI_PASSWORD", "XUANMEI_PASSWORD"),
+  };
   const coconut = await login("coconut");
   const xuanmei = await login("xuanmei");
 

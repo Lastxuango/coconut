@@ -27,15 +27,10 @@ Fill `.env.local` with private values and a Blob token before using uploads loca
 
 ## Import Existing Cloudflare Data
 
-The old Cloudflare-hosted data cannot be read directly by Vercel. After the new Vercel project and Blob store are configured, run the one-time import script with temporary environment variables. It reads the old site through its authenticated APIs and writes the memories, photos, check-ins, cycles, and memos into Private Blob.
+The old Cloudflare-hosted data cannot be read directly by Vercel. After the new Vercel project and Blob store are configured, add the Blob token to your ignored local `.env.local`, then run the one-time import script. It reads the old site through its authenticated APIs and writes the memories, photos, check-ins, cycles, and memos into Private Blob.
 
 ```powershell
-$env:LEGACY_BASE_URL = "https://your-old-site.example"
-$env:LEGACY_MASTER_PASSWORD = "..."
-$env:LEGACY_COCONUT_PASSWORD = "..."
-$env:LEGACY_XUANMEI_PASSWORD = "..."
-$env:BLOB_READ_WRITE_TOKEN = "..."
 pnpm exec node scripts/migrate-cloudflare-data.mjs
 ```
 
-The script does not save passwords or tokens. Profile passwords must be set as Vercel environment variables before deploying the migrated site.
+The script defaults to the existing password values in `.env.local`. If either personal password has changed since the Cloudflare site was first deployed, set the matching temporary `LEGACY_COCONUT_PASSWORD` or `LEGACY_XUANMEI_PASSWORD` variable before running it. The script does not save passwords or tokens. Profile passwords must be set as Vercel environment variables before deploying the migrated site.
