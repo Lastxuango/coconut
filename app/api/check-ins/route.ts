@@ -1,9 +1,9 @@
-import { env } from "cloudflare:workers";
 import {
   getProfile,
   type LoveProfile,
   noStoreHeaders,
 } from "@/app/lib/password-auth";
+import { getBucket } from "@/app/lib/private-storage";
 
 const MOODS = new Set(["happy", "sad", "love", "kiss", "calm", "tired"]);
 type Visibility = "public" | "private";
@@ -18,15 +18,6 @@ type CheckIn = {
   visibility: Visibility;
   createdAt: string;
 };
-
-function getBucket() {
-  const bucket = env.PHOTOS;
-  if (!bucket) {
-    throw new Error("Photo storage is not configured.");
-  }
-
-  return bucket;
-}
 
 function encodeMetadata(value: string) {
   return encodeURIComponent(value);

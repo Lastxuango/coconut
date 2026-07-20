@@ -1,5 +1,5 @@
-import { env } from "cloudflare:workers";
 import { getProfile, noStoreHeaders } from "@/app/lib/password-auth";
+import { getBucket } from "@/app/lib/private-storage";
 
 type Memo = {
   id: string;
@@ -7,15 +7,6 @@ type Memo = {
   content: string;
   createdAt: string;
 };
-
-function getBucket() {
-  const bucket = env.PHOTOS;
-  if (!bucket) {
-    throw new Error("Private storage is not configured.");
-  }
-
-  return bucket;
-}
 
 function encodeMetadata(value: string) {
   return encodeURIComponent(value);

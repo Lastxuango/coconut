@@ -1,9 +1,9 @@
-import { env } from "cloudflare:workers";
 import {
   getProfile,
   type LoveProfile,
   noStoreHeaders,
 } from "@/app/lib/password-auth";
+import { getBucket } from "@/app/lib/private-storage";
 
 const MAX_FILE_SIZE = 8 * 1024 * 1024;
 const UPLOAD_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -22,15 +22,6 @@ type PhotoRecord = {
   owner: LoveProfile | null;
   visibility: Visibility;
 };
-
-function getBucket() {
-  const bucket = env.PHOTOS;
-  if (!bucket) {
-    throw new Error("Photo storage is not configured.");
-  }
-
-  return bucket;
-}
 
 function fieldValue(value: FormDataEntryValue | null) {
   return typeof value === "string" ? value.trim() : "";

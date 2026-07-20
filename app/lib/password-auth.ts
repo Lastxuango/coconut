@@ -1,4 +1,4 @@
-import { env } from "cloudflare:workers";
+import { getBucket } from "@/app/lib/private-storage";
 
 export type LoveProfile = "coconut" | "xuanmei";
 
@@ -21,8 +21,8 @@ type CredentialStore = {
 };
 
 function masterConfiguration() {
-  const password = env.MEMORY_PASSWORD?.trim();
-  const sessionSecret = env.MEMORY_SESSION_SECRET?.trim();
+  const password = process.env.MEMORY_PASSWORD?.trim();
+  const sessionSecret = process.env.MEMORY_SESSION_SECRET?.trim();
 
   if (!password || !sessionSecret) {
     throw new Error("Password protection is not configured.");
@@ -32,23 +32,14 @@ function masterConfiguration() {
 }
 
 function profileConfiguration() {
-  const coconut = env.COCONUT_PASSWORD?.trim();
-  const xuanmei = env.XUANMEI_PASSWORD?.trim();
+  const coconut = process.env.COCONUT_PASSWORD?.trim();
+  const xuanmei = process.env.XUANMEI_PASSWORD?.trim();
 
   if (!coconut || !xuanmei) {
     throw new Error("Profile passwords are not configured.");
   }
 
   return { coconut, xuanmei };
-}
-
-function getBucket() {
-  const bucket = env.PHOTOS;
-  if (!bucket) {
-    throw new Error("Private storage is not configured.");
-  }
-
-  return bucket;
 }
 
 function toBase64Url(bytes: Uint8Array) {

@@ -17,15 +17,18 @@ test("defines a personal couple memory experience", async () => {
   assert.match(component, /api\/check-ins/);
 });
 
-test("stores memories with an owner and visibility", async () => {
-  const [uploadRoute, photoRoute, hostingConfig, nextConfig] = await Promise.all([
+test("stores memories in private Vercel Blob storage", async () => {
+  const [uploadRoute, photoRoute, storage, nextConfig] = await Promise.all([
     readFile(new URL("../app/api/photos/route.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/api/photos/[id]/route.ts", import.meta.url), "utf8"),
-    readFile(new URL("../.openai/hosting.json", import.meta.url), "utf8"),
+    readFile(new URL("../app/lib/private-storage.ts", import.meta.url), "utf8"),
     readFile(new URL("../next.config.ts", import.meta.url), "utf8"),
   ]);
 
-  assert.match(hostingConfig, /"r2":\s*"PHOTOS"/);
+  assert.match(storage, /@vercel\/blob/);
+  assert.match(storage, /access: PRIVATE_ACCESS/);
+  assert.match(storage, /METADATA_PREFIX/);
+  assert.match(storage, /allowOverwrite: true/);
   assert.match(uploadRoute, /formData\.get\("author"\)/);
   assert.match(uploadRoute, /visibility/);
   assert.match(uploadRoute, /owner: profile/);
