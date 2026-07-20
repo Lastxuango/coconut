@@ -1,18 +1,9 @@
-import { env } from "cloudflare:workers";
 import {
   getProfile,
   type LoveProfile,
   noStoreHeaders,
 } from "@/app/lib/password-auth";
-
-function getBucket() {
-  const bucket = env.PHOTOS;
-  if (!bucket) {
-    throw new Error("Photo storage is not configured.");
-  }
-
-  return bucket;
-}
+import { getBucket } from "@/app/lib/private-storage";
 
 function asProfile(value: string | undefined): LoveProfile | null {
   return value === "coconut" || value === "xuanmei" ? value : null;

@@ -32,13 +32,13 @@ dev-server.*.log
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.local.example
 .dev.vars
 
 # vercel
 .vercel
 
 # typescript
-next-env.d.ts
 *.tsbuildinfo
 /dist/
 /.wrangler/

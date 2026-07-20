@@ -1,5 +1,5 @@
-import { env } from "cloudflare:workers";
 import { getProfile, noStoreHeaders } from "@/app/lib/password-auth";
+import { getBucket } from "@/app/lib/private-storage";
 
 const CYCLE_KEY = "periods/coconut/cycles.json";
 
@@ -9,15 +9,6 @@ type Cycle = {
   endDate: string | null;
   createdAt: string;
 };
-
-function getBucket() {
-  const bucket = env.PHOTOS;
-  if (!bucket) {
-    throw new Error("Private storage is not configured.");
-  }
-
-  return bucket;
-}
 
 function validDate(value: unknown): value is string {
   if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
