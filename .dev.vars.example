@@ -1,0 +1,5 @@
+# Copy this file to .dev.vars and set your own private values before starting the site.
+MEMORY_PASSWORD=replace-with-your-password
+MEMORY_SESSION_SECRET=replace-with-a-long-random-secret
+COCONUT_PASSWORD=replace-with-coconut-profile-password
+XUANMEI_PASSWORD=replace-with-xuanmei-profile-password
